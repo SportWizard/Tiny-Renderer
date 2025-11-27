@@ -8,18 +8,17 @@
 #include <vector>
 
 Model::Model(string filename, int scale, int padding) {
-  this->scale = scale;
-  this->padding = padding;
-
   vector<string> data = readFile(filename);
   this->extractData(data);
 
   this->normalize();
+  this->scaleModel(scale);
+  this->addingPadding(padding);
+  this->convertToInt();
 
   // The use of 1 is because of normalization convert the value between [0, 1],
   // then multiple the scaling plus padding
-  this->framebuffer = TGAImage(this->scale + this->padding,
-                               this->scale + this->padding, TGAImage::RGB);
+  this->framebuffer = TGAImage(scale + padding, scale + padding, TGAImage::RGB);
 }
 
 void Model::extractData(vector<string> &data) {
@@ -68,18 +67,35 @@ void Model::normalize() {
   }
 }
 
-void Model::plot(Vertex3 &v) {
-  this->framebuffer.set(round(v.x * this->scale + this->padding / 2.0),
-                        round(v.y * this->scale + this->padding / 2.0), white);
+void Model::scaleModel(int scale) {
+  for (Vertex3 &v : this->vertices) {
+    v.x *= scale;
+    v.y *= scale;
+    // v.z *= scale;
+  }
 }
 
-void Model::line(double ax, double ay, double bx, double by, TGAColor color) {
-  // Apply Scaling and shift to center
-  ax = round(ax * this->scale + this->padding / 2.0);
-  ay = round(ay * this->scale + this->padding / 2.0);
-  bx = round(bx * this->scale + this->padding / 2.0);
-  by = round(by * this->scale + this->padding / 2.0);
+void Model::addingPadding(int padding) {
+  padding = round(padding / 2.0);
 
+  for (Vertex3 &v : this->vertices) {
+    v.x += padding;
+    v.y += padding;
+    // v.z += padding;
+  }
+}
+
+void Model::convertToInt() {
+  for (Vertex3 &v : this->vertices) {
+    v.x = round(v.x);
+    v.y = round(v.y);
+    // v.z = round(v.z);
+  }
+}
+
+void Model::plot(Vertex3 &v) { this->framebuffer.set(v.x, v.y, white); }
+
+void Model::line(double ax, double ay, double bx, double by, TGAColor color) {
   bool steep = abs(ax - bx) < abs(ay - by);
 
   // if the line is steep, we transpose the image

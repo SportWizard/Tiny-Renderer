@@ -20,11 +20,12 @@ private:
   TGAImage framebuffer;
   vector<Vertex3> vertices;
   vector<int> faces; // Polygons connecting the vertices
-  int scale;
-  int padding;
 
   void extractData(vector<string> &data);
   void normalize();
+  void scaleModel(int scale);
+  void addingPadding(int padding);
+  void convertToInt();
   void plot(Vertex3 &v);
   void line(double ax, double ay, double bx, double by, TGAColor color);
 
