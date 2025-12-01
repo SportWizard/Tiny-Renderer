@@ -111,7 +111,7 @@ void Model::line(double ax, double ay, double bx, double by, TGAColor color) {
   }
 
   for (int x = ax; x <= bx; x++) {
-    double t = (x - ax) / (bx - ax * 1.0);
+    double t = (x - ax) / static_cast<double>(bx - ax);
     int y = round(ay + t * (by - ay));
 
     if (steep)
